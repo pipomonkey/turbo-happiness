@@ -1,0 +1,387 @@
+<!DOCTYPE html> 
+<title>MEMORY PATTERN</title>
+<html lang="id">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, inital-scale=1.0">
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Arial', sans-serif;
+                background: #1a1a1a;
+                color: white;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                overflow-x: hidden;
+                overflow-y: scroll;
+            }
+
+            .container {
+                text-align: center;
+                padding: 20px;
+                max-width: 600px;
+                width: 100%;
+            }
+
+            h1 {
+                font-size: 6rem;
+                font-weight: bold;
+                margin-bottom: 20px;
+                letter-spacing: 2px;
+            }
+            
+             .subtitle {
+            font-size: 5rem;
+            font-weight: bold;
+            margin-bottom: 60px;
+            letter-spacing: 2px;
+        }
+
+        .description {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            margin: 40px 0;
+            padding: 0 20px;
+        }
+
+        .button {
+            background: white;
+            color: black;
+            border: none;
+            padding: 20px 60px;
+            font-size: 2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 8px 0 #00d9ff;
+            transition: all 0.1s;
+            margin: 10px;
+            position: relative;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 0 #00d9ff;
+        }
+
+        .button:active {
+            transform: translateY(4px);
+            box-shadow: 0 4px 0 #00d9ff;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            grid-template-rows: repeat(4, 100px);
+            gap: 20px;
+            justify-content: center;
+            margin: 30px auto;
+        }
+
+        .cell {
+            background: white;
+            border: 3px solid white;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 8px;
+        }
+
+        .cell:hover {
+            transform: scale(0.8);
+        }
+
+        .cell.yellow {
+            background: #FFD700;
+        }
+
+        .cell.selected {
+            background: #FFD700;
+        }
+
+        .cell.correct {
+            background: #FFD700;
+        }
+
+        .level-indicator {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            text-align: center;
+        }
+
+        .wrong-icon {
+            font-size: 15rem;
+            color: #ff0000;
+            font-weight: bold;
+            margin-bottom: 30px;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-5deg); }
+            75% { transform: rotate(5deg); }
+        }
+
+        .wrong-text {
+            font-size: 4rem;
+            font-weight: bold;
+            margin-bottom: 50px;
+            letter-spacing: 3px;
+        }
+
+        .win-icon {
+            font-size: 10rem;
+            margin-bottom: 30px;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .submit-button {
+            background: #4CAF50;
+            color: white;
+            margin-top: 30px;
+        }
+
+        .submit-button:hover {
+            background: #45a049;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            .subtitle {
+                font-size: 3rem;
+            }
+            .grid {
+                grid-template-columns: repeat(3, 100px);
+                grid-template-rows: repeat(3, 100px);
+                gap: 15px;
+            }
+            .button {
+                padding: 15px 40px;
+                font-size: 1.5rem;
+                text-align: center;
+            }
+            .wrong-icon {
+                font-size: 10rem;
+            }
+            .wrong-text {
+                font-size: 2.5rem;
+            }
+        }
+        </style>
+    </head>
+    <body>
+        <div id ="welcomeScreen" class="container">
+            <h1>MEM0RY</h1>
+            <div class="subtitle">PATTERN</div>
+            <div class="subtitle" style="margin-top: -40px;">GAME</div>
+            <button class="button" onclick="showInstructions()">MULAI</button>
+        </div>
+
+        <div id="instructionsScreen" class="container hidden">
+            <h1>MEMORY</h1>
+            <h1>PATTERN</h1>
+
+            <div class="button-container">
+                <button class="button" onclick="showWelcome()">KEMBALI</button>
+                <button class="button" onclick="startGame()">LANJUT</button>
+            </div>
+        </div>
+
+        <div id="gameScreen" class="container hidden">
+            <h1>MEMORY</h1>
+            <h1>PATTERN</h1>
+            <div class="level-indicator" id="levelIndicator"></div>
+            <div class="grid" id="grid"></div>
+            <button class="button submit-button hidden" id="submitButton" onclick="checkAnswer()">SUBMIT</button>
+        </div>
+
+        <div id="wrongModal" class="modal">
+            <div class="modal-content">
+                <div class="wrong-icon">❌</div>
+                <div class="wrong-text">SALAH!!!!</div>
+                <button class="button" onclick="restartGame()">KEMBALI</button>
+            </div>
+        </div>
+
+        <div id="winModal" class="modal">
+            <h1 style="font-size: 1rem; text-align: center;">KAMU CERDAS!</h1>
+            <div class="description" style="font-size: medium; text-align: bottom;">
+                Kamu berhasil menyelesaikan semua level!
+            </div>
+            <button class="button" onclick="restartGame()" style="margin-top: 40px;">MAIN LAGI</button>
+        </div>
+        <script>
+            let currentLevel = 1;
+            let pattern = [];
+            let userSelection = []
+            let isShowingPattern = false;
+
+            function showWelcome (){
+                document.getElementById('welcomeScreen').classList.remove('hidden');
+                document.getElementById('instructionsScreen').classList.add('hidden');
+                document.getElementById('gameScreen').classList.add('hidden');
+            }
+
+            function showInstructions(){
+                document.getElementById('welcomeScreen').classList.add('hidden');
+                document.getElementById('instructionsScreen').classList.remove('hidden');
+                document.getElementById('gameScreen').classList.add('hidden');
+            }
+            function startGame() {
+            currentLevel = 1;
+            document.getElementById('welcomeScreen').classList.add('hidden');
+            document.getElementById('instructionsScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            initLevel();
+        }
+
+        function initLevel() {
+            userSelection = [];
+            document.getElementById('levelIndicator').textContent = `LEVEL ${currentLevel}`;
+            createGrid();
+            generatePattern();
+            setTimeout(() => showPattern(), 700);
+        }
+
+        function createGrid() {
+            const grid = document.getElementById('grid');
+            grid.innerHTML = '';
+            for (let i = 0; i < 16; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                cell.dataset.index = i;
+                cell.addEventListener('click', () => selectCell(i));
+                grid.appendChild(cell);
+            }
+        }
+
+        function generatePattern() {
+            pattern = [];
+            while (pattern.length < 6) {
+                const random = Math.floor(Math.random() * 16);
+                if (!pattern.includes(random)) {
+                    pattern.push(random);
+                }
+            }
+        }
+
+        function showPattern() {
+            isShowingPattern = true;
+            const cells = document.querySelectorAll('.cell');
+            
+           
+            pattern.forEach(index => {
+                cells[index].classList.add('yellow');
+            });
+
+           
+            setTimeout(() => {
+                pattern.forEach(index => {
+                    cells[index].classList.remove('yellow');
+                });
+                isShowingPattern = false;
+                document.getElementById('submitButton').classList.remove('hidden');
+            }, 500);
+        }
+
+        function selectCell(index) {
+            if (isShowingPattern) return;
+            
+            const cell = document.querySelectorAll('.cell')[index];
+            
+            if (userSelection.includes(index)) {
+                // Deselect
+                userSelection = userSelection.filter(i => i !== index);
+                cell.classList.remove('selected');
+            } else {
+                // Select
+                if (userSelection.length < 25) {
+                    userSelection.push(index);
+                    cell.classList.add('selected');
+                }
+            }
+        }
+
+        function checkAnswer() {
+            if (userSelection.length !== 6) {
+                alert('Pilih 6 kotak!');
+                return;
+            }
+
+            
+            const sortedPattern = [...pattern].sort((a, b) => a - b);
+            const sortedSelection = [...userSelection].sort((a, b) => a - b);
+            
+            const isCorrect = JSON.stringify(sortedPattern) === JSON.stringify(sortedSelection);
+
+            if (isCorrect) {
+                // JAWABAN YANG BENAR
+                if (currentLevel === 20) {
+                    // MENAG!
+                    document.getElementById('winModal').classList.add('active');
+                } else {
+                    // LEVEL SELANJUTNYA
+                    currentLevel++;
+                    setTimeout(() => initLevel(), 500);
+                }
+            } else {
+                // JAWABAN YANG SA;AH 
+                document.getElementById('wrongModal').classList.add('active');
+            }
+        }
+
+        function restartGame() {
+            document.getElementById('wrongModal').classList.remove('active');
+            document.getElementById('winModal').classList.remove('active');
+            currentLevel = 1;
+            showWelcome();
+        }
+        </script>
+    </body>
+</html>
